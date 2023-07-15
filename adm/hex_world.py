@@ -247,9 +247,30 @@ class HexWorld:
                         T[from_index, move.value, to_index] += prob
         return T
 
+    def get_mdp_reward_matrix(self):
+        """Get reward matrix corresponding to the hexagon world.
+
+        Reward matrix maps state and action to reward.
+        Should be |states| x |actions|
+        """
+        states = [state for row in self.hexagons for state in row]
+        num_states = len(states)
+        R = np.zeros((num_states, 6))
+        for row_index, row in enumerate(self.hexagons):
+            for col_index, hexagon in enumerate(row):
+                from_index = states.index(hexagon)
+                for move in HexMove:
+                    next_state = hexagon.get_next_hexagon(move)
+                    if next_state == None:
+                        R[from_index, move.value] = -1
+                    if hexagon.score > 0:
+                        R[from_index, move.value] = hexagon.score
+        return R
+
+    def get_mdp(self):
+        return self.get_mdp_transition_matrix(), self.get_mdp_reward_matrix()
+
     def graph(self, ax, show_score=True, show_policy=False):
-        # if self.policy == None:
-        #     show_policy = False
         vertices = np.array(
             [
                 [0, 1],
@@ -283,7 +304,12 @@ class HexWorld:
                     ha="center",
                     va="center",
                 )
-                target_vertex = 0.5 * verticies_new[3] + 0.5 * verticies_new[4]
+                target_index = hexagon.policy.value - 1
+                target_index_next = target_index + 1 if target_index + 1 <= 5 else 0
+                target_vertex = (
+                    0.5 * verticies_new[target_index]
+                    + 0.5 * verticies_new[target_index_next]
+                )
                 if show_policy:
                     arrow_props = dict(arrowstyle="-|>", linewidth=2, color="red")
                     ax.annotate(
