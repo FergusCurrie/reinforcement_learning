@@ -8,6 +8,7 @@ maps a move to a tile.
 import numpy as np
 from enum import Enum
 import matplotlib.pyplot as plt
+from typing import Optional
 
 GRID = [
     [
@@ -78,7 +79,9 @@ move2anti_clockwise_move = {
 
 
 class Hexagon:
-    def __init__(self, score: int, blank: bool = False):
+    def __init__(
+        self, score: int, blank: bool = False, policy: Optional[HexMove] = None
+    ):
         self.score = score
         self.blank = blank
         self.north_west = None
@@ -87,7 +90,15 @@ class Hexagon:
         self.south_east = None
         self.south_west = None
         self.west = None
-        self.policy = None
+        self.policy = policy
+
+    def reachable_states(self, move: HexMove):
+        """Returns a lottery of reachable states from this hexagon"""
+        return [
+            (0.15, self.get_next_hexagon(move2clockwise_move[move])),
+            (0.7, self.get_next_hexagon(move)),
+            (0.15, self.get_next_hexagon(move2anti_clockwise_move[move])),
+        ]
 
     def fuzzy_move(self, move: HexMove) -> HexMove:
         r = np.random.random()
@@ -123,7 +134,7 @@ class Hexagon:
 
 
 class HexWorld:
-    def __init__(self, grid):
+    def __init__(self, grid: list, policy: list):
         self.position = [0, 0]
         self.hexagons = []
         # init hexagons
@@ -131,10 +142,14 @@ class HexWorld:
             hexagon_row = []
             for col_index, hexagon in enumerate(row):
                 if hexagon != "X":
-                    hexagon = Hexagon(score=int(hexagon))
+                    hexagon = Hexagon(
+                        score=int(hexagon), policy=policy[row_index][col_index]
+                    )
                     hexagon_row.append(hexagon)
                 else:
-                    hexagon = Hexagon(score=-1, blank=True)
+                    hexagon = Hexagon(
+                        score=-1, blank=True, policy=policy[row_index][col_index]
+                    )
                     hexagon_row.append(hexagon)
             self.hexagons.append(hexagon_row)
 
@@ -208,7 +223,33 @@ class HexWorld:
                                     col_index - 1
                                 ]
 
+    def get_mdp_transition_matrix(self):
+        """Get transsmisions matrix corresponding to the hexagon world.
+
+        Transition matrix maps state and action to probability of each state.
+        Should be |states| x |actions| x |states|
+        """
+        states = [state for row in self.hexagons for state in row]  # if not state.blank
+        num_states = len(states)
+        T = np.zeros((num_states, 6, num_states))
+        for row_index, row in enumerate(self.hexagons):
+            for col_index, hexagon in enumerate(row):
+                if hexagon.blank:
+                    continue
+                for move in HexMove:
+                    lottery = hexagon.reachable_states(move)
+                    for prob, next_state in lottery:
+                        from_index = states.index(hexagon)
+                        if next_state == None:
+                            to_index = from_index
+                        else:
+                            to_index = states.index(next_state)
+                        T[from_index, move.value, to_index] += prob
+        return T
+
     def graph(self, ax, show_score=True, show_policy=False):
+        # if self.policy == None:
+        #     show_policy = False
         vertices = np.array(
             [
                 [0, 1],
