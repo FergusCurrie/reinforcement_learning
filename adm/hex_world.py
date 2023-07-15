@@ -7,6 +7,7 @@ maps a move to a tile.
 
 import numpy as np
 from enum import Enum
+import matplotlib.pyplot as plt
 
 GRID = [
     [
@@ -86,6 +87,7 @@ class Hexagon:
         self.south_east = None
         self.south_west = None
         self.west = None
+        self.policy = None
 
     def fuzzy_move(self, move: HexMove) -> HexMove:
         r = np.random.random()
@@ -205,6 +207,58 @@ class HexWorld:
                                 hexagon.south_west = self.hexagons[row_index + 1][
                                     col_index - 1
                                 ]
+
+    def graph(self, ax, show_score=True, show_policy=False):
+        vertices = np.array(
+            [
+                [0, 1],
+                [np.sqrt(3) / 2, 0.5],
+                [np.sqrt(3) / 2, -0.5],
+                [0, -1],
+                [-np.sqrt(3) / 2, -0.5],
+                [-np.sqrt(3) / 2, 0.5],
+                [0, 1],
+            ]
+        )
+        for row_index, row in enumerate(self.hexagons):
+            for col_index, hexagon in enumerate(row):
+                verticies_new = vertices.copy()
+                verticies_new[:, 0] += 1.75 * col_index
+                verticies_new[:, 1] -= 1.5 * row_index
+                if row_index % 2 != 0:
+                    verticies_new[:, 0] += 1.75 / 2
+                center = np.mean(verticies_new, axis=0)
+
+                ax.plot(
+                    verticies_new[:, 0],
+                    verticies_new[:, 1],
+                    "b-",
+                )
+                s = f"{hexagon.score}" if show_score else ""
+                ax.text(
+                    center[0],
+                    center[1],
+                    s,
+                    ha="center",
+                    va="center",
+                )
+                target_vertex = 0.5 * verticies_new[3] + 0.5 * verticies_new[4]
+                if show_policy:
+                    arrow_props = dict(arrowstyle="-|>", linewidth=2, color="red")
+                    ax.annotate(
+                        "",
+                        xy=target_vertex,
+                        xytext=center,
+                        ha="center",
+                        va="center",
+                        arrowprops=arrow_props,
+                    )
+
+    def plt_graph(self, show_score=True, show_policy=False):
+        fig, ax = plt.subplots(1, 1)
+        self.graph(ax, show_score=show_score, show_policy=show_policy)
+        plt.axis("equal")  # Set equal scaling for x and y axes
+        plt.axis("off")
 
 
 if __name__ == "__main__":
