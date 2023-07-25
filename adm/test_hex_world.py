@@ -1,11 +1,12 @@
 import pytest
 import numpy as np
-from hex_world import HexWorld
+from hex_world import HexMove, HexWorld
 
 
 def test_small_hex_world():
+    policy = [[HexMove.EAST for _ in range(2)] for _ in range(2)]
     grid = [["1", "2"], ["3", "4"]]
-    hw = HexWorld(grid=grid)
+    hw = HexWorld(grid=grid, policy=policy)
     # check top left hexagon
     assert hw.hexagons[0][0].west == None
     assert hw.hexagons[0][0].north_east == None

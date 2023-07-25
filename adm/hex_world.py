@@ -94,9 +94,9 @@ class Hexagon:
 
     def reachable_states(self, move: HexMove):
         """Returns a lottery of reachable states from this hexagon"""
-        return [
-            (1, self.get_next_hexagon(move)),
-        ]
+        # return [
+        #     (1, self.get_next_hexagon(move)),
+        # ]
         return [
             (0.15, self.get_next_hexagon(move2clockwise_move[move])),
             (0.7, self.get_next_hexagon(move)),
@@ -231,44 +231,51 @@ class HexWorld:
         """Get transsmisions matrix corresponding to the hexagon world.
 
         Transition matrix maps state and action to probability of each state.
-        Should be |states| x |actions| x |states|
+        Should be |states|+1 x |actions| x |states|+1. +1 is for the terminal state
         """
-        states = [state for row in self.hexagons for state in row]  # if not state.blank
+        states = [state for row in self.hexagons for state in row]
         num_states = len(states)
-        T = np.zeros((num_states, 6, num_states))
-        for row_index, row in enumerate(self.hexagons):
-            for col_index, hexagon in enumerate(row):
+        T = np.zeros((num_states + 1, 6, num_states + 1))
+        for _, row in enumerate(self.hexagons):
+            for _, hexagon in enumerate(row):
+                from_index = states.index(hexagon)
+
                 if hexagon.blank:
                     continue
-                for move in HexMove:
-                    lottery = hexagon.reachable_states(move)
-                    for prob, next_state in lottery:
-                        from_index = states.index(hexagon)
-                        if next_state == None:
-                            to_index = from_index
-                        else:
-                            to_index = states.index(next_state)
-                        T[from_index, move.value, to_index] += prob
+
+                # for positive scores, move to terminal state
+                if hexagon.score > 0:
+                    T[from_index, :, len(states)] = np.ones(6)
+                else:
+                    for move in HexMove:
+                        lottery = hexagon.reachable_states(move)
+                        for prob, next_state in lottery:
+                            if next_state == None:
+                                to_index = from_index
+                            else:
+                                to_index = states.index(next_state)
+                            T[from_index, move.value, to_index] += prob
+        T[len(states), :, len(states)] = np.ones(6)
         return T
 
     def get_mdp_reward_matrix(self):
         """Get reward matrix corresponding to the hexagon world.
 
         Reward matrix maps state and action to reward.
-        Should be |states| x |actions|
+        Should be |states|+1 x |actions|. +1 is for the terminal state
         """
         states = [state for row in self.hexagons for state in row]
         num_states = len(states)
-        R = np.zeros((num_states, 6))
-        for row_index, row in enumerate(self.hexagons):
-            for col_index, hexagon in enumerate(row):
+        R = np.zeros((num_states + 1, 6))
+        for _, row in enumerate(self.hexagons):
+            for _, hexagon in enumerate(row):
                 from_index = states.index(hexagon)
                 for move in HexMove:
                     next_state = hexagon.get_next_hexagon(move)
                     if next_state == None:
                         R[from_index, move.value] = -1
-                    if hexagon.score > 0:
-                        R[from_index, move.value] = hexagon.score
+                    # overwrite reward for terminal state
+                    R[from_index, move.value] = hexagon.score
         return R
 
     def get_mdp(self):

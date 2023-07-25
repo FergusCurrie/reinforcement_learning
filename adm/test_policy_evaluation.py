@@ -53,41 +53,19 @@ EAST_POLICY = [[HexMove.EAST for _ in range(10)] for _ in range(3)]
 #     print(U)
 
 
-# def test_transmission_lookahead_recursive_small_max_depth():
-#     grid = [["10", "0", "0", "0", "0", "10"], ["X", "X", "X", "X", "X", "X"]]
-#     policy = [[HexMove.EAST for _ in range(10)], [HexMove.EAST for _ in range(10)]]
-#     hw = HexWorld(grid=grid, policy=policy)
-#     T, R = hw.get_mdp()
-#     U = transmission_lookahead(T, R, hw)
-#     print(R)
-#     print(U)
+def test_transmission_and_loopy_equal_small_problem():
+    grid = [["10", "0", "0", "0", "0", "10"], ["X", "X", "X", "X", "X", "X"]]
+    policy = [[HexMove.EAST for _ in range(10)], [HexMove.EAST for _ in range(10)]]
+    hw = HexWorld(grid=grid, policy=policy)
+    T, R = hw.get_mdp()
+    Ut = transmission_lookahead(T, R, hw)
+    Ul = loopy_lookahead(hw)
+    assert np.allclose(Ut, Ul)
 
 
-# def test_loopy_lookahead_recursive_small_max_depth():
-#     grid = [["10", "0", "0", "0", "0", "10"], ["X", "X", "X", "X", "X", "X"]]
-#     policy = [[HexMove.EAST for _ in range(10)], [HexMove.EAST for _ in range(10)]]
-#     hw = HexWorld(grid=grid, policy=policy)
-#     T, R = hw.get_mdp()
-#     U = loopy_lookahead(hw)
-#     print(R)
-#     print(U)
-
-
-def test_transmission_lookahead_recursive_small_max_depth():
+def test_transmission_and_loopy_equal_large_problem():
     hw = HexWorld(grid=GRID, policy=EAST_POLICY)
     T, R = hw.get_mdp()
-    print(R)
-    U = transmission_lookahead(T, R, hw)
-    print(U.reshape(3, 10))
-
-
-def test_loopy_lookahead_recursive_small_max_depth():
-    hw = HexWorld(grid=GRID, policy=EAST_POLICY)
-    T, R = hw.get_mdp()
-    U = loopy_lookahead(hw)
-    print(U.reshape(3, 10))
-
-
-test_transmission_lookahead_recursive_small_max_depth()
-print()
-test_loopy_lookahead_recursive_small_max_depth()
+    Ut = transmission_lookahead(T, R, hw)
+    Ul = loopy_lookahead(hw)
+    assert np.allclose(Ut, Ul)
