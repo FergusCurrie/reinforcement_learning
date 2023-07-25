@@ -5,13 +5,14 @@ Repo for implementations of different RL algorithms.
 # List of implementations:
 
 - multi-armed bandits
-  - algorithm: multi-armed_bandit.py
+  - algorithm: multi_armed_bandit.py
   - results: bandit_algorithm_results.ipynb
   - implmented:
-    - epsilon-greedy
-    - incremental mean epsilon-greedy
-    - upper confidence bound action selection
-    - gradient bandit
+    - [x] epsilon-greedy
+    - [x] incremental mean epsilon-greedy
+    - [x] upper confidence bound action selection
+    - [x] gradient bandit
+    - [ ] thompson sampling
 
 # Other
 

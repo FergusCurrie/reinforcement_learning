@@ -95,22 +95,25 @@ class Hexagon:
     def reachable_states(self, move: HexMove):
         """Returns a lottery of reachable states from this hexagon"""
         return [
+            (1, self.get_next_hexagon(move)),
+        ]
+        return [
             (0.15, self.get_next_hexagon(move2clockwise_move[move])),
             (0.7, self.get_next_hexagon(move)),
             (0.15, self.get_next_hexagon(move2anti_clockwise_move[move])),
         ]
 
-    def fuzzy_move(self, move: HexMove) -> HexMove:
-        r = np.random.random()
-        if r < 0.15:
-            # return anticlockwise move
-            return move2anti_clockwise_move[move]
-        elif r > 0.85:
-            # return clockwise move
-            return move2clockwise_move[move]
-        else:
-            # return move
-            return move
+    # def fuzzy_move(self, move: HexMove) -> HexMove:
+    #     r = np.random.random()
+    #     if r < 0.15:
+    #         # return anticlockwise move
+    #         return move2anti_clockwise_move[move]
+    #     elif r > 0.85:
+    #         # return clockwise move
+    #         return move2clockwise_move[move]
+    #     else:
+    #         # return move
+    #         return move
 
     def get_next_hexagon(self, move: HexMove):
         if move == HexMove.NORTH_WEST:
@@ -128,15 +131,16 @@ class Hexagon:
         else:
             raise ValueError("Invalid move")
 
-    def move(self, move: HexMove):
-        fuzzy_move = self.fuzzy_move(move)
-        return self.get_next_hexagon(fuzzy_move)
+    # def move(self, move: HexMove):
+    #     fuzzy_move = self.fuzzy_move(move)
+    #     return self.get_next_hexagon(fuzzy_move)
 
 
 class HexWorld:
     def __init__(self, grid: list, policy: list):
         self.position = [0, 0]
         self.hexagons = []
+        self.grid = grid
         # init hexagons
         for row_index, row in enumerate(grid):
             hexagon_row = []
