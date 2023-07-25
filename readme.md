@@ -1,3 +1,20 @@
+# Reinforcement Learning
+
+Repo for implementations of different RL algorithms.
+
+# List of implementations:
+
+- multi-armed bandits
+  - algorithm: multi-armed_bandit.py
+  - results: bandit_algorithm_results.ipynb
+  - implmented:
+    - epsilon-greedy
+    - incremental mean epsilon-greedy
+    - upper confidence bound action selection
+    - gradient bandit
+
+# Other
+
 ## Problems:
 
 - multi-armed bandits
