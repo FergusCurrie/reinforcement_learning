@@ -13,6 +13,13 @@ Repo for implementations of different RL algorithms.
     - [x] upper confidence bound action selection
     - [x] gradient bandit
     - [ ] thompson sampling
+- markov decision process
+  - code: policy_evaluatoin.py
+  - results: policy_evaluation_results.ipynb
+  - implemented:
+    - [x] policy evaluation loopy
+    - [x] policy evaluation w transition matrix
+    - [x] policy evaluation w system of equations
 
 # Other
 
