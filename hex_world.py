@@ -82,7 +82,7 @@ class Hexagon:
     def __init__(
         self, score: int, blank: bool = False, policy: Optional[HexMove] = None
     ):
-        self.score = score
+        self.score = int(score)
         self.blank = blank
         self.north_west = None
         self.north_east = None
@@ -103,18 +103,6 @@ class Hexagon:
             (0.15, self.get_next_hexagon(move2anti_clockwise_move[move])),
         ]
 
-    # def fuzzy_move(self, move: HexMove) -> HexMove:
-    #     r = np.random.random()
-    #     if r < 0.15:
-    #         # return anticlockwise move
-    #         return move2anti_clockwise_move[move]
-    #     elif r > 0.85:
-    #         # return clockwise move
-    #         return move2clockwise_move[move]
-    #     else:
-    #         # return move
-    #         return move
-
     def get_next_hexagon(self, move: HexMove):
         if move == HexMove.NORTH_WEST:
             return self.north_west
@@ -131,9 +119,21 @@ class Hexagon:
         else:
             raise ValueError("Invalid move")
 
-    # def move(self, move: HexMove):
-    #     fuzzy_move = self.fuzzy_move(move)
-    #     return self.get_next_hexagon(fuzzy_move)
+    def fuzzy_move(self, move: HexMove) -> HexMove:
+        r = np.random.random()
+        if r < 0.15:
+            # return anticlockwise move
+            return move2anti_clockwise_move[move]
+        elif r > 0.85:
+            # return clockwise move
+            return move2clockwise_move[move]
+        else:
+            # return move
+            return move
+
+    def move(self, move: HexMove):
+        fuzzy_move = self.fuzzy_move(move)
+        return self.get_next_hexagon(fuzzy_move)
 
 
 class HexWorld:
@@ -221,10 +221,10 @@ class HexWorld:
                                 ]
 
                         # south west
-                        if row_index + 1 < len(grid) and col_index - 1 > 0:
-                            if not self.hexagons[row_index + 1][col_index - 1].blank:
+                        if row_index + 1 < len(grid) and col_index > 0:
+                            if not self.hexagons[row_index + 1][col_index].blank:
                                 hexagon.south_west = self.hexagons[row_index + 1][
-                                    col_index - 1
+                                    col_index
                                 ]
 
     def get_mdp_transition_matrix(self):
@@ -244,7 +244,7 @@ class HexWorld:
                     continue
 
                 # for positive scores, move to terminal state
-                if hexagon.score > 0:
+                if hexagon.score != 0 and hexagon.score != -1:
                     T[from_index, :, len(states)] = np.ones(6)
                 else:
                     for move in HexMove:
