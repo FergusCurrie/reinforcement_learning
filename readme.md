@@ -5,28 +5,43 @@ Repo for implementations of different RL algorithms.
 # List of implementations:
 
 - multi-armed bandits
-  - algorithm: multi_armed_bandit.py
-  - results: bandit_algorithm_results.ipynb
-  - implmented:
-    - [x] epsilon-greedy
-    - [x] incremental mean epsilon-greedy
-    - [x] upper confidence bound action selection
-    - [x] gradient bandit
-    - [ ] thompson sampling
-- markov decision process
-  - code: policy_evaluatoin.py
-  - results: policy_evaluation_results.ipynb
-  - implemented:
+  - [x] epsilon-greedy
+  - [x] incremental mean epsilon-greedy
+  - [x] upper confidence bound action selection
+  - [x] gradient bandit
+  - [ ] thompson sampling
+- tabular methods
+  - dynamic programming
     - [x] policy evaluation loopy
     - [x] policy evaluation w transition matrix
     - [x] policy evaluation w system of equations
+  - monte carlo
+    - [x] first-visit MC prediction
+    - [ ] explorint starts mc predictin
+    - [ ] on policy first-visit mc
+    - [ ] off-policy mc predictins
+    - [ ] off-policy mc control
+    - [ ]
+  - td methods
+    - [ ] one-step td
+    - [ ] sarsa
+    - [ ] q-learning
+    - [ ] double q learning
+    - [ ] n-step td
+    - [ ] n-step sarsa
+    - [ ] off policy n-step sarsa
+    - [ ] n-step tree backup
+    - [ ] n-step q(sigma)
+  - planning
+    - [ ] dyna-q
 
 # Other
 
 ## Problems:
 
-- multi-armed bandits
-- markov decision processes
+- [x] multi-armed bandits
+- [x] hexworld (markov decision processes)
+- [ ] 2048
 
 ## directories
 
